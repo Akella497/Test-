@@ -58,7 +58,8 @@
 
   <div class="map-container">
     <svg viewBox="0 0 800 600">
-      <image href="Map Of Brightstone.svg" width="800" height="600" />
+      <image href="https://raw.githubusercontent.com/USER/REPO/main/Map%20Of%20Brightstone.svg
+" width="800" height="600" />
 
       <!-- Пример интерактивной области (ромб) -->
       <polygon class="hover-area" data-tooltip="Это центральная площадь района." points="400,100 450,150 400,200 350,150" />
