@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Самоцветы</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      background: #f0f4f7;
+    }
+
+    .map-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    svg {
+      max-width: 800px;
+      border: 2px solid #333;
+      border-radius: 8px;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 0;
+      left: 820px; /* справа от карты */
+      width: 250px;
+      padding: 10px;
+      background: rgba(50,50,50,0.9);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 16px;
+      pointer-events: none; /* чтобы не мешало курсору */
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .hover-area {
+      fill: transparent;
+      cursor: pointer;
+    }
+
+    .hover-area:hover {
+      fill: rgba(255, 0, 0, 0.2); /* подсветка области */
+    }
+
+    .hover-area[data-tooltip]:hover ~ .tooltip {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="map-container">
+    <svg viewBox="0 0 800 600">
+      <image href="artwork.jpg" width="800" height="600" />
+
+      <!-- Пример интерактивной области (ромб) -->
+      <polygon class="hover-area" data-tooltip="Это центральная площадь района." points="400,100 450,150 400,200 350,150" />
+      
+      <!-- Другие области -->
+      <polygon class="hover-area" data-tooltip="Здесь находится старый рынок." points="200,300 250,350 200,400 150,350" />
+      <polygon class="hover-area" data-tooltip="Жилой квартал Белая улица." points="600,400 650,450 600,500 550,450" />
+    </svg>
+
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <script>
+    const tooltip = document.getElementById('tooltip');
+    const areas = document.querySelectorAll('.hover-area');
+
+    areas.forEach(area => {
+      area.addEventListener('mouseenter', (e) => {
+        tooltip.textContent = area.getAttribute('data-tooltip');
+        const rect = area.getBoundingClientRect();
+        tooltip.style.top = (rect.top + window.scrollY) + 'px';
+      });
+      area.addEventListener('mouseleave', () => {
+        tooltip.textContent = '';
+      });
+    });
+  </script>
+
+</body>
+</html>
