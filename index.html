@@ -2,176 +2,61 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Fantasy Map</title>
-
+  <title>Каталог</title>
   <style>
-    html, body {
+    /* Сброс стандартных стилей */
+    * {
       margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #0b0f1a;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
-    #viewport {
-      width: 100%;
-      height: 100%;
-      cursor: grab;
-      position: relative;
+    /* Фон страницы */
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f4f7, #d9e2ec);
     }
 
-    #viewport:active {
-      cursor: grabbing;
+    /* Контейнер для кнопок */
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Расстояние между кнопками */
     }
 
-    #map {
-      position: absolute;
-      transform-origin: 0 0;
-    }
-
-    #map img {
-      display: block;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    /* События */
-    .event {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: crimson;
-      box-shadow: 0 0 8px crimson;
-      transform: translate(-50%, -50%);
-      pointer-events: auto;
-    }
-
-    /* Tooltip */
-    #tooltip {
-      position: fixed;
-      pointer-events: none;
-      background: rgba(0,0,0,0.85);
+    /* Стили кнопок */
+    .catalog-button {
+      padding: 20px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
       color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.15s;
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none; /* Для ссылок */
+      display: inline-block;
+    }
+
+    .catalog-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
   </style>
 </head>
-
 <body>
 
-<div id="viewport">
-  <div id="map">
-    <img
-      src="https://www.upload.ee/files/18905644/Poster-Map-Of-Doskvol.svg.html">https://www.upload.ee/files/18905644/Poster-Map-Of-Doskvol.svg.html"
-      alt="Fantasy Map"
-      draggable="false"
-    >
-
-    <!-- событие -->
-    <div
-      class="event"
-      data-x="1200"
-      data-y="800"
-      data-title="Заброшенный алтарь"
-      data-text="Древнее место силы">
-    </div>
+  <div class="button-container">
+    <a href="https://github.com/username/repository/blob/main/Sam.html" class="catalog-button" target="_blank">Самоцветы</a>
+    <a href="https://github.com/username/repository/blob/main/SG.html" class="catalog-button" target="_blank">Старый город</a>
+    <a href="https://github.com/username/repository/blob/main/WK.html" class="catalog-button" target="_blank">Белая корона</a>
   </div>
-</div>
-
-<div id="tooltip"></div>
-
-<script>
-  const viewport = document.getElementById('viewport');
-  const map = document.getElementById('map');
-  const tooltip = document.getElementById('tooltip');
-  const img = map.querySelector('img');
-
-  let scale = 1;
-  let translateX = 0;
-  let translateY = 0;
-
-  let isDragging = false;
-  let startX, startY;
-
-  /* ===== Перетаскивание ===== */
-  viewport.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('event')) return;
-
-    isDragging = true;
-    startX = e.clientX - translateX;
-    startY = e.clientY - translateY;
-  });
-
-  window.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-
-  window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-
-    translateX = e.clientX - startX;
-    translateY = e.clientY - startY;
-    updateTransform();
-  });
-
-  /* ===== Зум колесом ===== */
-  viewport.addEventListener('wheel', e => {
-    e.preventDefault();
-
-    const zoomSpeed = 0.1;
-    const direction = e.deltaY > 0 ? -1 : 1;
-    const newScale = scale + direction * zoomSpeed;
-
-    if (newScale < 0.4 || newScale > 3) return;
-
-    const rect = map.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-
-    translateX -= offsetX * (newScale / scale - 1);
-    translateY -= offsetY * (newScale / scale - 1);
-
-    scale = newScale;
-    updateTransform();
-  }, { passive: false });
-
-  function updateTransform() {
-    map.style.transform =
-      `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-  }
-
-  /* ===== Центрирование карты ===== */
-  img.onload = () => {
-    translateX = (viewport.clientWidth - img.width) / 2;
-    translateY = (viewport.clientHeight - img.height) / 2;
-    updateTransform();
-  };
-
-  /* ===== События ===== */
-  document.querySelectorAll('.event').forEach(event => {
-    event.style.left = event.dataset.x + 'px';
-    event.style.top = event.dataset.y + 'px';
-
-    event.addEventListener('mouseenter', () => {
-      tooltip.innerHTML =
-        `<strong>${event.dataset.title}</strong><br>${event.dataset.text}`;
-      tooltip.style.opacity = 1;
-    });
-
-    event.addEventListener('mousemove', e => {
-      tooltip.style.left = e.clientX + 12 + 'px';
-      tooltip.style.top = e.clientY + 12 + 'px';
-    });
-
-    event.addEventListener('mouseleave', () => {
-      tooltip.style.opacity = 0;
-    });
-  });
-</script>
 
 </body>
 </html>
