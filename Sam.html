@@ -21,6 +21,7 @@ html, body {
   cursor: grab;
 }
 
+/* ===== КАРТА ===== */
 #map {
   position: absolute;
   top: 0;
@@ -29,17 +30,82 @@ html, body {
   pointer-events: none;
   transform-origin: top left;
 }
+
+/* ===== СЛОЙ ТОЧЕК (НЕ ДВИГАЕТСЯ) ===== */
+#markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ===== ТОЧКА ===== */
+.marker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #caa96a;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(202,169,106,0.8);
+  pointer-events: auto;
+  cursor: help;
+}
+
+/* ===== ВСПЛЫВАЮЩЕЕ ОКНО ===== */
+.marker .tooltip {
+  position: absolute;
+  left: 22px;          /* СПРАВА ОТ ТОЧКИ */
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 200px;
+
+  padding: 10px 14px;
+  background: rgba(15,18,20,0.95);
+  border: 1px solid rgba(202,169,106,0.5);
+  color: #e8e4d8;
+  font-size: 14px;
+  line-height: 1.4;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  white-space: normal;
+}
+
+/* Показ по наведению */
+.marker:hover .tooltip {
+  opacity: 1;
+}
 </style>
 </head>
 
 <body>
 
 <div id="viewport">
+
+  <!-- КАРТА -->
   <img
     id="map"
     src="https://cdn.imgpile.com/f/czYW80F_xl.jpg"
     draggable="false"
   >
+
+  <!-- ТОЧКИ -->
+  <div id="markers">
+    <div class="marker" style="left: 35%; top: 42%;">
+      <div class="tooltip">
+        Самоцветы<br>
+        Район контрабандистов и арканистов.
+      </div>
+    </div>
+
+    <div class="marker" style="left: 58%; top: 61%;">
+      <div class="tooltip">
+        Заброшенная башня<br>
+        Источник духовной активности.
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -51,8 +117,8 @@ let startX = 0, startY = 0;
 let translateX = 0, translateY = 0;
 let scale = 1;
 
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
+function clamp(v, min, max) {
+  return Math.min(Math.max(v, min), max);
 }
 
 function updateTransform() {
@@ -66,20 +132,18 @@ map.onload = () => {
   const iw = map.naturalWidth;
   const ih = map.naturalHeight;
 
-  // Масштаб: чтобы карта влезла по меньшей стороне
   scale = Math.max(vw / iw, vh / ih);
 
-  const scaledWidth = iw * scale;
-  const scaledHeight = ih * scale;
+  const w = iw * scale;
+  const h = ih * scale;
 
-  // Центрирование
-  translateX = (vw - scaledWidth) / 2;
-  translateY = (vh - scaledHeight) / 2;
+  translateX = (vw - w) / 2;
+  translateY = (vh - h) / 2;
 
   updateTransform();
 };
 
-viewport.addEventListener("mousedown", (e) => {
+viewport.addEventListener("mousedown", e => {
   isDragging = true;
   viewport.style.cursor = "grabbing";
   startX = e.clientX;
@@ -91,7 +155,7 @@ window.addEventListener("mouseup", () => {
   viewport.style.cursor = "grab";
 });
 
-window.addEventListener("mousemove", (e) => {
+window.addEventListener("mousemove", e => {
   if (!isDragging) return;
 
   const dx = e.clientX - startX;
@@ -103,18 +167,11 @@ window.addEventListener("mousemove", (e) => {
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
 
-  const mapWidth = map.naturalWidth * scale;
-  const mapHeight = map.naturalHeight * scale;
+  const mw = map.naturalWidth * scale;
+  const mh = map.naturalHeight * scale;
 
-  translateX += dx;
-  translateY += dy;
-
-  // Ограничения
-  const minX = vw - mapWidth;
-  const minY = vh - mapHeight;
-
-  translateX = clamp(translateX, minX, 0);
-  translateY = clamp(translateY, minY, 0);
+  translateX = clamp(translateX + dx, vw - mw, 0);
+  translateY = clamp(translateY + dy, vh - mh, 0);
 
   updateTransform();
 });
