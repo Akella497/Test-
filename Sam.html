@@ -21,28 +21,22 @@ html, body {
   cursor: grab;
 }
 
-/* ===== СЛОЙ КАРТЫ (ДВИГАЕТСЯ) ===== */
-#map-layer {
+/* КОНТЕЙНЕР КАРТЫ + ТОЧЕК */
+#map-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   transform-origin: top left;
 }
 
+/* КАРТА */
 #map {
   display: block;
   user-select: none;
   pointer-events: none;
 }
 
-/* ===== UI-СЛОЙ (СТАТИЧЕН) ===== */
-#ui-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-/* ===== ТОЧКА ===== */
+/* ТОЧКИ */
 .marker {
   position: absolute;
   width: 14px;
@@ -50,25 +44,22 @@ html, body {
   background: #caa96a;
   border-radius: 50%;
   box-shadow: 0 0 12px rgba(202,169,106,0.8);
-  pointer-events: auto;
   cursor: help;
 }
 
-/* ===== TOOLTIP ===== */
+/* TOOLTIP */
 .marker .tooltip {
   position: absolute;
-  left: 22px;          /* СПРАВА ОТ ТОЧКИ */
+  left: 22px;  /* справа от точки */
   top: 50%;
   transform: translateY(-50%);
   min-width: 220px;
-
   padding: 10px 14px;
   background: rgba(15,18,20,0.95);
   border: 1px solid rgba(202,169,106,0.5);
   color: #e8e4d8;
   font-size: 14px;
   line-height: 1.4;
-
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
@@ -84,29 +75,19 @@ html, body {
 
 <div id="viewport">
 
-  <!-- ДВИГАЕМАЯ КАРТА -->
-  <div id="map-layer">
+  <div id="map-wrapper">
     <img
       id="map"
       src="https://cdn.imgpile.com/f/czYW80F_xl.jpg"
       draggable="false"
     >
-  </div>
 
-  <!-- СТАТИЧНЫЕ ТОЧКИ -->
-  <div id="ui-layer">
-    <div class="marker" style="left: 40%; top: 45%;">
-      <div class="tooltip">
-        Самоцветы<br>
-        Район торговли и тёмных сделок.
-      </div>
+    <!-- ТОЧКИ -->
+    <div class="marker" style="left:35%; top:42%;">
+      <div class="tooltip">Самоцветы<br>Район торговли</div>
     </div>
-
-    <div class="marker" style="left: 62%; top: 60%;">
-      <div class="tooltip">
-        Заброшенная башня<br>
-        Очаг духовной активности.
-      </div>
+    <div class="marker" style="left:58%; top:61%;">
+      <div class="tooltip">Заброшенная башня<br>Очаг духовной активности</div>
     </div>
   </div>
 
@@ -114,7 +95,7 @@ html, body {
 
 <script>
 const viewport = document.getElementById("viewport");
-const mapLayer = document.getElementById("map-layer");
+const wrapper = document.getElementById("map-wrapper");
 const map = document.getElementById("map");
 
 let isDragging = false;
@@ -127,24 +108,24 @@ function clamp(v, min, max) {
 }
 
 function updateTransform() {
-  mapLayer.style.transform =
-    `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  wrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
 }
 
 map.onload = () => {
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
-
   const iw = map.naturalWidth;
   const ih = map.naturalHeight;
 
+  // масштаб, чтобы карта закрывала экран
   scale = Math.max(vw / iw, vh / ih);
 
   const w = iw * scale;
   const h = ih * scale;
 
-  translateX = (vw - w) / 2;
-  translateY = (vh - h) / 2;
+  // центрируем карту
+  translateX = (vw - w)/2;
+  translateY = (vh - h)/2;
 
   updateTransform();
 };
@@ -162,7 +143,7 @@ window.addEventListener("mouseup", () => {
 });
 
 window.addEventListener("mousemove", e => {
-  if (!isDragging) return;
+  if(!isDragging) return;
 
   const dx = e.clientX - startX;
   const dy = e.clientY - startY;
@@ -172,7 +153,6 @@ window.addEventListener("mousemove", e => {
 
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
-
   const mw = map.naturalWidth * scale;
   const mh = map.naturalHeight * scale;
 
