@@ -59,28 +59,57 @@ html, body {
 }
 
 /* TOOLTIP */
-.marker .tooltip, .bee .tooltip {
-    position: absolute;
-    left: 100px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40rem;
-    padding: 10px 14px;
-    background: rgba(15, 18, 20, 0.95);
-    border: 1px solid rgba(202, 169, 106, 0.5);
-    color: #e8e4d8;
-    font-size: 30pt;
-    line-height: 1.4;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    text-align: center;
-    }
+/* Латунная кромка */
+.marker .tooltip,
+.bee .tooltip {
+  position: absolute;
+  left: 100px;                /* справа от точки */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40rem;
+  padding: 28px 34px;
 
-.marker:hover .tooltip, .bee:hover .tooltip {
-    opacity: 1;
-    }
+  /* === Латунная кромка непосредственно === */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(30,38,45,0.85),
+      rgba(12,16,20,0.9)
+    );
 
+  border: 1px solid rgba(180,150,90,0.25);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.7),
+    0 30px 80px rgba(0,0,0,0.8);
+
+  color: #e8e4d8;
+  font-family: 'Merriweather', serif;
+  font-size: 22pt;
+  line-height: 1.5;
+  text-align: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+/* Латунная внутренняя кромка */
+.marker .tooltip::before,
+.bee .tooltip::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(180,150,90,0.25);
+  pointer-events: none;
+}
+
+/* Появление */
+.marker:hover .tooltip,
+.bee:hover .tooltip {
+  opacity: 1;
+}
+  
   /* Адаптация под мобильные */
 @media (max-width: 768px) {
   .marker, .bee { 
